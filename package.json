@@ -1,0 +1,18 @@
+{
+	"name": "caster-bot",
+	"version": "1.0.0",
+	"description": "chromecast slack bot",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Lee",
+	"license": "MIT",
+	"dependencies": {
+		"node-fetch": "^1.7.3",
+		"slackbots": "^1.1.0"
+	},
+	"devDependencies": {
+		"prettier": "^1.8.2"
+	}
+}
