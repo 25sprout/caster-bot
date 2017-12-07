@@ -6,38 +6,54 @@ const params = {
 	icon_emoji: ':speaker:',
 };
 
-const API_ENDPOING = 'http://192.168.1.55:8080';
+const API_ENDPOING = 'http://192.168.1.101';
 
 const handlePlaylist = {
-	start(data, commands) {
-		bot.postMessage(data.channel, '開始播放', params);
+	start(userData, commands) {
+		bot.postMessage(userData.channel, '開始播放', params);
 	},
-	async add(data, commands) {
-		console.log(commands);
-		const res = await fetch(`${API_ENDPOING}/api/youtube/${commands[0]}`);
-
-		console.log(res.status);
-
-		if (res.status === 200) {
-			return bot.postMessage(data.channel, `加入 ${commands[0]}`, params);
+	async add(userData, commands) {
+		if (commands.length === 0) {
+			return bot.postMessage(userData.channel, '你壞壞', params);
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		const res = await fetch(`${API_ENDPOING}/api/youtube/${commands[0]}`);
+
+		const { status, message = '' } = await res.json();
+
+		if (status) {
+			return bot.postMessage(userData.channel, `加入 ${commands[0]}`, params);
+		}
+
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	async list(data, commands) {
+	async show(userData, commands) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube`, { method: 'GET' });
 
-		if (res.status === 200) {
-			const { playlists } = await res.json();
+		const { status, message = '', data } = await res.json();
 
-			console.log(playlists);
+		if (status) {
+			const { playlist, pointer } = data;
+
+			// console.log(playlist);
 
 			return bot.postMessage(
-				data.channel,
+				userData.channel,
 				'',
 				Object.assign({}, params, {
 					attachments: JSON.stringify(
-						playlists.map(item => ({
+						playlist.map(item => ({
 							author_name: item.youtube_id,
 							text: `歌名： *${item.name}*`,
 							mrkdwn_in: ['text', 'fields'],
@@ -53,85 +69,172 @@ const handlePlaylist = {
 			);
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	async delete(data, commands) {
+	async delete(userData, commands) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube/${commands[0]}`, {
 			method: 'DELETE',
 		});
 
-		if (res.status === 200) {
-			return bot.postMessage(data.channel, `刪除 ${commands[0]}`, params);
+		const { status, message = '' } = await res.json();
+
+		if (status) {
+			return bot.postMessage(userData.channel, `刪除 ${commands[0]}`, params);
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	loop(data, commands) {
-		bot.postMessage(data.channel, '循環播放', params);
+	loop(userData, commands) {
+		bot.postMessage(userData.channel, '循環播放', params);
 	},
-	else(data) {
-		bot.postMessage(data.channel, '你打錯字了!!還是你想跟我聊天？', params);
+	async else(userData) {
+		bot.postMessage(userData.channel, '你打錯字了!!還是你想跟我聊天？', params);
 	},
 };
 
 module.exports = {
-	playlist(data, commands) {
+	list(userData, commands) {
 		if (commands.length > 0 && commands[0] in handlePlaylist) {
 			const [command, ...otherCommands] = commands;
-			handlePlaylist[command](data, otherCommands);
+			handlePlaylist[command](userData, otherCommands);
 		} else {
 			const [_, ...otherCommands] = commands;
-			handlePlaylist.else(data, otherCommands);
+			handlePlaylist.else(userData, otherCommands);
 		}
 	},
-	async space(data) {
+	async space(userData) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube/space`, { method: 'POST' });
 
-		console.log(res);
+		const { status, message = '' } = await res.json();
 
-		if (res.status === 200) {
-			return bot.postMessage(data.channel, '暫停/播放', params);
+		if (status) {
+			return bot.postMessage(userData.channel, '暫停/播放');
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	async up(data) {
+	async up(userData) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube/up`, { method: 'POST' });
 
-		console.log(res.status);
+		const { status, message = '' } = await res.json();
 
-		if (res.status === 200) {
-			return bot.postMessage(data.channel, '大聲', params);
+		if (status) {
+			return bot.postMessage(userData.channel, '大聲', params);
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	async down(data) {
+	async down(userData) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube/down`, { method: 'POST' });
 
-		console.log(res.status);
+		const { status, message = '' } = await res.json();
 
-		if (res.status === 200) {
-			return bot.postMessage(data.channel, '小聲', params);
+		if (status) {
+			return bot.postMessage(userData.channel, '小聲', params);
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	next(data) {
-		bot.postMessage(data.channel, '下一首', params);
+	async next(userData) {
+		const res = await fetch(`${API_ENDPOING}/api/youtube/next`, { method: 'POST' });
+
+		const { status, message = '' } = await res.json();
+
+		if (status) {
+			return bot.postMessage(userData.channel, '下一首', params);
+		}
+
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	async quit(data) {
+	async quit(userData) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube/quit`, { method: 'POST' });
 
-		console.log(res.status);
+		const { status, message = '' } = await res.json();
 
-		if (res.status === 200) {
-			return bot.postMessage(data.channel, '結束', params);
+		if (status) {
+			return bot.postMessage(userData.channel, '結束', params);
 		}
 
-		return bot.postMessage(data.channel, 'API 壞惹 找 peipei', params);
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
 	},
-	else(data) {
-		bot.postMessage(data.channel, '你打錯字了!!還是你想跟我聊天？', params);
+	else(userData) {
+		bot.postMessage(userData.channel, '你打錯字了!!還是你想跟我聊天？', params);
 	},
 };
