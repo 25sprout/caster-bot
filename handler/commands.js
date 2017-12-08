@@ -18,6 +18,8 @@ const handlePlaylist = {
 			return bot.postMessage(userData.channel, '你壞壞', params);
 		}
 
+		await bot.postMessage(userData.channel, `好的馬上為你加入 ${commands[0]} 請稍等`, params);
+
 		const { members } = await bot.getUsers();
 
 		const [user] = members.filter(member => member.id === userData.user);
@@ -36,7 +38,7 @@ const handlePlaylist = {
 		const { status, message = '' } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, `加入 ${commands[0]}`, params);
+			return bot.postMessage(userData.channel, `已加入 ${commands[0]}`, params);
 		}
 
 		return bot.postMessage(
@@ -102,7 +104,7 @@ const handlePlaylist = {
 		const { status, message = '' } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, `刪除 ${commands[0]}`, params);
+			return bot.postMessage(userData.channel, `好的，馬上為你刪除 ${commands[0]}`, params);
 		}
 
 		return bot.postMessage(
@@ -142,7 +144,7 @@ module.exports = {
 		const { status, message = '' } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, '暫停/播放');
+			return bot.postMessage(userData.channel, '好的，馬上為你暫停/播放');
 		}
 
 		return bot.postMessage(
@@ -164,7 +166,7 @@ module.exports = {
 		const { status, message = '' } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, '大聲', params);
+			return bot.postMessage(userData.channel, '好的，馬上為你轉大聲', params);
 		}
 
 		return bot.postMessage(
@@ -186,7 +188,7 @@ module.exports = {
 		const { status, message = '' } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, '小聲', params);
+			return bot.postMessage(userData.channel, '好的，馬上為你轉小聲', params);
 		}
 
 		return bot.postMessage(
@@ -208,7 +210,7 @@ module.exports = {
 		const { status, message = '' } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, '下一首', params);
+			return bot.postMessage(userData.channel, '好的，馬上為你播放下一首', params);
 		}
 
 		return bot.postMessage(
@@ -248,5 +250,28 @@ module.exports = {
 	},
 	else(userData) {
 		bot.postMessage(userData.channel, '你打錯字了!!還是你想跟我聊天？', params);
+	},
+	help(userData) {
+		return bot.postMessage(
+			userData.channel,
+			'',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						color: '#353535',
+						author_name: '僕人點播機在此為您服務，在頻道裡點歌請加上 caster 我還會理你喔～私訊只要下以下指令就可以了',
+						text: `- *list add {Youtube ID}* 加入一首歌的 youtube id
+- *list show* 列出目前歌曲前後五首歌曲
+- *list delete* {Youtube ID} 刪除一首歌
+- *space* 暫停/播放
+- *up* 大聲
+- *down* 小聲
+- *next* 下一首
+- *help* 指令列表`,
+						mrkdwn_in: ['text'],
+					},
+				]),
+			}),
+		);
 	},
 };
