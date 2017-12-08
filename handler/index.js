@@ -17,7 +17,11 @@ const processCommand = (command, data, commands) => {
 };
 
 module.exports = data => {
-	if (data.type === 'message' && data.subtype !== 'bot_message') {
+	if (
+		data.type === 'message' &&
+		data.subtype !== 'bot_message' &&
+		typeof data.text !== 'undefined'
+	) {
 		const commands = data.text.split(' ');
 		const { channel } = data;
 

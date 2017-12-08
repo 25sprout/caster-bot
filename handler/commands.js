@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const FormData = require('form-data');
 
 const bot = require('../bot');
 
@@ -17,7 +18,20 @@ const handlePlaylist = {
 			return bot.postMessage(userData.channel, '你壞壞', params);
 		}
 
-		const res = await fetch(`${API_ENDPOING}/api/youtube/${commands[0]}`);
+		const { members } = await bot.getUsers();
+
+		const [user] = members.filter(member => member.id === userData.user);
+
+		const formData = new FormData();
+
+		formData.append('email', user.profile.email);
+		formData.append('name', user.name);
+		formData.append('slack_id', user.id);
+
+		const res = await fetch(`${API_ENDPOING}/api/youtube/create/${commands[0]}`, {
+			method: 'POST',
+			body: formData,
+		});
 
 		const { status, message = '' } = await res.json();
 
@@ -46,23 +60,21 @@ const handlePlaylist = {
 		if (status) {
 			const { playlist, pointer } = data;
 
-			// console.log(playlist);
+			const index = playlist.findIndex(e => e.id === pointer);
+
+			const startPointer = index > 3 ? index - 3 : 0;
+			const endPointer = index + 3 > playlist.length ? playlist.length : index + 3;
 
 			return bot.postMessage(
 				userData.channel,
 				'',
 				Object.assign({}, params, {
 					attachments: JSON.stringify(
-						playlist.map(item => ({
+						playlist.slice(startPointer, endPointer).map(item => ({
+							color: item.id === pointer ? '#3C6E71' : '#D9D9D9',
 							author_name: item.youtube_id,
 							text: `歌名： *${item.name}*`,
-							mrkdwn_in: ['text', 'fields'],
-							fields: [
-								{
-									value: `歌手： *${item.singer}*`,
-									short: false,
-								},
-							],
+							mrkdwn_in: ['text'],
 						})),
 					),
 				}),
