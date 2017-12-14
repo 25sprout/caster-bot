@@ -35,10 +35,57 @@ const handlePlaylist = {
 			body: formData,
 		});
 
-		const { status, message = '' } = await res.json();
+		const { status, message = '', data: { snippet } } = await res.json();
 
 		if (status) {
-			return bot.postMessage(userData.channel, `已加入 ${commands[0]}`, params);
+			const songTitle = typeof snippet !== 'undefined' ? snippet.title : commands[0];
+
+			return bot.postMessage(userData.channel, `已加入 ${songTitle}`, params);
+		}
+
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
+	},
+	async search(userData, commands) {
+		if (commands.length === 0) {
+			return bot.postMessage(userData.channel, '你壞壞', params);
+		}
+
+		const keyword = commands.join(' ');
+
+		await bot.postMessage(userData.channel, `好的馬上為你搜尋 ${keyword} 請稍等`, params);
+
+		const { members } = await bot.getUsers();
+
+		const [user] = members.filter(member => member.id === userData.user);
+
+		const formData = new FormData();
+
+		formData.append('email', user.profile.email);
+		formData.append('name', user.name);
+		formData.append('slack_id', user.id);
+
+		const res = await fetch(`${API_ENDPOING}/api/youtube/search/${keyword}`, {
+			method: 'POST',
+			body: formData,
+		});
+
+		const { status, message = '', data: { snippet } } = await res.json();
+
+		if (status) {
+			const songTitle = typeof snippet !== 'undefined' ? snippet.title : keyword;
+
+			return bot.postMessage(userData.channel, `已加入 ${songTitle}`, params);
 		}
 
 		return bot.postMessage(
@@ -124,7 +171,11 @@ const handlePlaylist = {
 		bot.postMessage(userData.channel, '循環播放', params);
 	},
 	async else(userData) {
-		bot.postMessage(userData.channel, '你打錯字了!!還是你想跟我聊天？', params);
+		bot.postMessage(
+			userData.channel,
+			'你打錯字了!!還是你想跟我聊天？溫馨小提醒想查指令可以打 caster help 喔！',
+			params,
+		);
 	},
 };
 
@@ -249,7 +300,11 @@ module.exports = {
 		);
 	},
 	else(userData) {
-		bot.postMessage(userData.channel, '你打錯字了!!還是你想跟我聊天？', params);
+		bot.postMessage(
+			userData.channel,
+			'你打錯字了!!還是你想跟我聊天？溫馨小提醒想查指令可以打 caster help 喔！',
+			params,
+		);
 	},
 	help(userData) {
 		return bot.postMessage(
@@ -259,8 +314,10 @@ module.exports = {
 				attachments: JSON.stringify([
 					{
 						color: '#353535',
-						author_name: '僕人點播機在此為您服務，在頻道裡點歌請加上 caster 我還會理你喔～私訊只要下以下指令就可以了',
+						author_name:
+							'僕人點播機在此為您服務，在頻道裡點歌請加上 caster 我還會理你喔～私訊只要下以下指令就可以了',
 						text: `- *list add {Youtube ID}* 加入一首歌的 youtube id
+- *list search {keyword}* 自動搜尋關鍵字，並加入搜尋結果的第一首歌
 - *list show* 列出目前歌曲前後五首歌曲
 - *list delete* {Youtube ID} 刪除一首歌
 - *space* 暫停/播放
