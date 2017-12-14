@@ -111,8 +111,8 @@ const handlePlaylist = {
 
 			const index = playlist.findIndex(e => e.id === pointer);
 
-			const startPointer = index > 3 ? index - 3 : 0;
-			const endPointer = index + 3 > playlist.length ? playlist.length : index + 3;
+			const startPointer = index > 2 ? index - 2 : 0;
+			const endPointer = index + 4 > playlist.length ? playlist.length : index + 4;
 
 			return bot.postMessage(
 				userData.channel,
