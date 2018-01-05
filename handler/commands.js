@@ -2,12 +2,11 @@ const fetch = require('node-fetch');
 const FormData = require('form-data');
 
 const bot = require('../bot');
+const { API_ENDPOING } = require('../bot/config');
 
 const params = {
 	icon_emoji: ':speaker:',
 };
-
-const API_ENDPOING = 'http://192.168.1.101';
 
 const handlePlaylist = {
 	start(userData, commands) {
