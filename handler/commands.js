@@ -314,7 +314,7 @@ module.exports = {
 					{
 						color: '#353535',
 						author_name:
-							'僕人點播機在此為您服務，在頻道裡點歌請加上 caster 我還會理你喔～私訊只要下以下指令就可以了',
+							'僕人點播機在此為您服務，在頻道裡點歌請加上 caster 我才會理你喔～私訊只要下以下指令就可以了',
 						text: `- *list add {Youtube ID}* 加入一首歌的 youtube id
 - *list search {keyword}* 自動搜尋關鍵字，並加入搜尋結果的第一首歌
 - *list show* 列出目前歌曲前後五首歌曲
