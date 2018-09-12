@@ -276,7 +276,7 @@ module.exports = {
 			}),
 		);
 	},
-	async start(userData) {
+	async broadcast(userData) {
 		const res = await fetch(`${API_ENDPOING}/api/youtube/start`, { method: 'POST' });
 
 		const { status, message = '' } = await res.json();
@@ -345,7 +345,9 @@ module.exports = {
 - *up* 大聲
 - *down* 小聲
 - *next* 下一首
-- *help* 指令列表`,
+- *help* 指令列表
+- *broadcast* 開始播放
+- *quit* 結束播放`,
 						mrkdwn_in: ['text'],
 					},
 				]),
