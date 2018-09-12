@@ -276,8 +276,30 @@ module.exports = {
 			}),
 		);
 	},
+	async start(userData) {
+		const res = await fetch(`${API_ENDPOING}/api/youtube/start`, { method: 'POST' });
+
+		const { status, message = '' } = await res.json();
+
+		if (status) {
+			return bot.postMessage(userData.channel, '開始', params);
+		}
+
+		return bot.postMessage(
+			userData.channel,
+			'API 壞惹 找 peipei',
+			Object.assign({}, params, {
+				attachments: JSON.stringify([
+					{
+						author_name: message,
+						color: 'danger',
+					},
+				]),
+			}),
+		);
+	},
 	async quit(userData) {
-		const res = await fetch(`${API_ENDPOING}/api/youtube/quit`, { method: 'POST' });
+		const res = await fetch(`${API_ENDPOING}/api/youtube/kill`, { method: 'POST' });
 
 		const { status, message = '' } = await res.json();
 
